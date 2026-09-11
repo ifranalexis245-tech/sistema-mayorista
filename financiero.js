@@ -346,14 +346,14 @@ function exportarExcelFinanciero() {
     return;
   }
   
-  let csvContent = "Fecha,Tipo,Categoría,Descripción,Monto\n";
+  let csvContent = "\uFEFFFecha;Tipo;Categoría;Descripción;Monto\n";
   filtrados.forEach(m => {
     const desc = String(m.descripcion || "").replace(/"/g, '""');
     const cat = String(m.categoria || "").replace(/"/g, '""');
-    csvContent += `"${m.fecha}","${m.tipo.toUpperCase()}","${cat}","${desc}",${m.monto}\n`;
+    csvContent += `"${m.fecha}";"${m.tipo.toUpperCase()}";"${cat}";"${desc}";${m.monto}\n`;
   });
   
-  const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);

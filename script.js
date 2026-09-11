@@ -526,27 +526,27 @@ render();
 // --- Seguridad de Datos ---
 
 function exportarExcel() {
-  let csvContent = "=== PRODUCTOS ===\n";
-  csvContent += "Cod/Lote,Nombre,Vencimiento,Categoria,Proveedor,Stock,Minimo,Costo,Precio,GananciaNeta,MargenBruto\n";
+  let csvContent = "\uFEFF=== PRODUCTOS ===\n";
+  csvContent += "Cod/Lote;Nombre;Vencimiento;Categoria;Proveedor;Stock;Minimo;Costo;Precio;GananciaNeta;MargenEsperado\n";
   productos.forEach(p => {
-    csvContent += `"${p.sku}","${p.nombre}","${p.vencimiento||''}","${p.categoria}","${p.proveedor||''}",${p.stock},${p.minimo},${p.costo},${p.precio},${p.gananciaNeta||0},${p.margenBruto||0}\n`;
+    csvContent += `"${p.sku}";"${p.nombre}";"${p.vencimiento||''}";"${p.categoria}";"${p.proveedor||''}";${p.stock};${p.minimo};${p.costo};${p.precio};${p.gananciaNeta||0};${p.margenEsperado||p.margenBruto||0}\n`;
   });
   
   csvContent += "\n=== MOVIMIENTOS ===\n";
-  csvContent += "Fecha,Tipo,Cantidad,Producto,Motivo,MetodoPago\n";
+  csvContent += "Fecha;Tipo;Cantidad;Producto;Motivo;MetodoPago\n";
   movimientos.forEach(m => {
     const p = productos.find(x => x.id === m.productoId);
     const prodName = p ? p.nombre : "Borrado";
-    csvContent += `"${m.fecha}","${m.tipo}",${m.cantidad},"${prodName}","${m.motivo}","${m.metodoPago||''}"\n`;
+    csvContent += `"${m.fecha}";"${m.tipo}";${m.cantidad};"${prodName}";"${m.motivo}";"${m.metodoPago||''}"\n`;
   });
 
   csvContent += "\n=== FLUJO DE CAJA ===\n";
-  csvContent += "Fecha,Tipo,Detalle,Monto\n";
+  csvContent += "Fecha;Tipo;Detalle;Monto\n";
   flujoCaja.forEach(m => {
-    csvContent += `"${m.fecha}","${m.tipo}","${m.detalle}",${m.monto}\n`;
+    csvContent += `"${m.fecha}";"${m.tipo}";"${m.detalle}";${m.monto}\n`;
   });
 
-  const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
