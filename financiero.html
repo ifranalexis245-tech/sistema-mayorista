@@ -44,36 +44,6 @@
     <section class="charts-grid">
       <article class="panel">
         <div class="panel-head">
-          <h2>Balance acumulado</h2>
-          <p>Curva de rendimiento · Cómo va quedando el saldo disponible diario</p>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartLinea"></canvas>
-        </div>
-      </article>
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Flujo acumulado</h2>
-          <p>Volumen histórico · Crecimiento paralelo de ingresos y egresos</p>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartArea"></canvas>
-        </div>
-      </article>
-    </section>
-
-    <section class="charts-grid tres">
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Ingresos por categoría</h2>
-          <p>Distribución de ventas por canales o métodos</p>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartTorta"></canvas>
-        </div>
-      </article>
-      <article class="panel">
-        <div class="panel-head">
           <h2>Egresos por categoría</h2>
           <p>Proveedores vs. Gastos Operativos</p>
         </div>
@@ -89,27 +59,6 @@
         <div class="chart-box gauge-wrap">
           <canvas id="chartGauge"></canvas>
           <div class="gauge-center" id="gaugeLabel"></div>
-        </div>
-      </article>
-    </section>
-
-    <section class="charts-grid">
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Ranking de categorías</h2>
-          <p>Comparativa total de volumen de dinero movido</p>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartHorizontal"></canvas>
-        </div>
-      </article>
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Peso de cada rubro</h2>
-          <p>Impacto relativo de ingresos y egresos juntos</p>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartPolar"></canvas>
         </div>
       </article>
     </section>
@@ -144,6 +93,10 @@
         </table>
       </div>
     </section>
+
+    <div style="text-align: right; margin-top: 1rem; margin-bottom: 2rem;">
+      <button type="button" class="ghost" id="btnLimpiarTodo" style="color: var(--danger); font-size: 0.85rem; border-color: transparent;">Limpiar todos los datos (Reset)</button>
+    </div>
   </main>
 
   <dialog class="modal" id="modal">

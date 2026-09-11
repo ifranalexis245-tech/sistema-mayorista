@@ -194,64 +194,7 @@ function renderCharts() {
     options: { ...common, scales: ticksMil },
   });
 
-  const diaria = serieDiaria();
-  upsert("chartLinea", {
-    type: "line",
-    data: {
-      labels: diaria.labels,
-      datasets: [
-        {
-          label: "Balance",
-          data: diaria.balance,
-          borderColor: NAVY,
-          backgroundColor: "rgba(32,62,127,.12)",
-          fill: false,
-          tension: 0.35,
-          pointRadius: 3,
-          pointBackgroundColor: ORANGE,
-        },
-      ],
-    },
-    options: { ...common, scales: ticksMil },
-  });
 
-  upsert("chartArea", {
-    type: "line",
-    data: {
-      labels: diaria.labels,
-      datasets: [
-        {
-          label: "Ingresos acum.",
-          data: diaria.ingAcc,
-          borderColor: NAVY,
-          backgroundColor: "rgba(32,62,127,.22)",
-          fill: true,
-          tension: 0.35,
-          pointRadius: 0,
-        },
-        {
-          label: "Egresos acum.",
-          data: diaria.egrAcc,
-          borderColor: ORANGE,
-          backgroundColor: "rgba(239,122,30,.22)",
-          fill: true,
-          tension: 0.35,
-          pointRadius: 0,
-        },
-      ],
-    },
-    options: { ...common, scales: ticksMil },
-  });
-
-  const ingCat = porCategoria("ingreso");
-  upsert("chartTorta", {
-    type: "pie",
-    data: {
-      labels: ingCat.labels,
-      datasets: [{ data: ingCat.data, backgroundColor: ingCat.colors, borderWidth: 0 }],
-    },
-    options: common,
-  });
 
   const egrCat = porCategoria("egreso");
   upsert("chartDona", {
@@ -284,29 +227,6 @@ function renderCharts() {
     },
   });
 
-  const ranking = volumenCategorias();
-  upsert("chartHorizontal", {
-    type: "bar",
-    data: {
-      labels: ranking.map(([k]) => k),
-      datasets: [{ label: "Volumen", data: ranking.map(([, v]) => v), backgroundColor: ranking.map((_, i) => colorDe(i)), borderRadius: 6 }],
-    },
-    options: {
-      ...common,
-      indexAxis: "y",
-      plugins: { legend: { display: false } },
-      scales: { x: { ticks: { callback: (v) => "$" + (v / 1000).toFixed(0) + " mil" } } },
-    },
-  });
-
-  upsert("chartPolar", {
-    type: "polarArea",
-    data: {
-      labels: ranking.map(([k]) => k),
-      datasets: [{ data: ranking.map(([, v]) => v), backgroundColor: ranking.map((_, i) => colorDe(i) + "cc") }],
-    },
-    options: common,
-  });
 }
 
 function render() {
@@ -360,6 +280,25 @@ document.getElementById("tablaMovimientos").addEventListener("click", (e) => {
     movimientos = movimientos.filter((m) => m.id !== del.dataset.del);
     persist();
     render();
+  }
+});
+
+document.getElementById("btnLimpiarTodo").addEventListener("click", () => {
+  if (confirm("⚠️ ADVERTENCIA: Estás a punto de borrar TODO el historial (Financiero y Stock).\n¿Estás completamente seguro?")) {
+    if (confirm("Última confirmación: Esta acción no se puede deshacer. Todo quedará en cero. ¿Continuar?")) {
+      localStorage.removeItem(KEY);
+      storeData = { productos: [], movimientos: [], flujoCaja: [] };
+      movimientos = [];
+      
+      // Update charts data to empty
+      Object.values(charts).forEach(chart => {
+        chart.data.datasets.forEach(ds => ds.data = []);
+        chart.update();
+      });
+      
+      render();
+      alert("El sistema ha sido reiniciado a cero exitosamente.");
+    }
   }
 });
 
