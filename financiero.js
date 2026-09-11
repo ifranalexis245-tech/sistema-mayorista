@@ -54,6 +54,12 @@ function load() {
 let movimientos = load();
 const charts = {};
 
+let currentMonthYear = new Date().toISOString().slice(0, 7); // e.g. "2026-09"
+
+function currentMovimientos() {
+  return movimientos.filter(m => m.fecha.startsWith(currentMonthYear));
+}
+
 function persist() {
   storeData.flujoCaja = movimientos.map(m => {
     return {
@@ -73,12 +79,12 @@ function semanaDelMes(fechaIso) {
 }
 
 function tot(tipo) {
-  return movimientos.filter((m) => m.tipo === tipo).reduce((a, m) => a + m.monto, 0);
+  return currentMovimientos().filter((m) => m.tipo === tipo).reduce((a, m) => a + m.monto, 0);
 }
 
 function porCategoria(tipo) {
   const map = {};
-  movimientos
+  currentMovimientos()
     .filter((m) => m.tipo === tipo)
     .forEach((m) => {
       map[m.categoria] = (map[m.categoria] || 0) + m.monto;
@@ -89,14 +95,14 @@ function porCategoria(tipo) {
 
 function volumenCategorias() {
   const map = {};
-  movimientos.forEach((m) => {
+  currentMovimientos().forEach((m) => {
     map[m.categoria] = (map[m.categoria] || 0) + m.monto;
   });
   return Object.entries(map).sort((a, b) => b[1] - a[1]);
 }
 
 function serieDiaria() {
-  const ordenados = [...movimientos].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const ordenados = [...currentMovimientos()].sort((a, b) => a.fecha.localeCompare(b.fecha));
   const labels = [];
   const balance = [];
   const ingAcc = [];
@@ -141,7 +147,7 @@ function renderKpis() {
 
 function renderFiltro() {
   const actual = document.getElementById("filtroCategoria").value || "Todas";
-  const categorias = ["Todas", ...new Set(movimientos.map((m) => m.categoria))];
+  const categorias = ["Todas", ...new Set(currentMovimientos().map((m) => m.categoria))];
   document.getElementById("filtroCategoria").innerHTML = categorias
     .map((c) => `<option ${c === actual ? "selected" : ""}>${esc(c)}</option>`)
     .join("");
@@ -149,7 +155,11 @@ function renderFiltro() {
 
 function renderTabla() {
   const filtro = document.getElementById("filtroCategoria").value || "Todas";
-  const filas = movimientos.filter((m) => filtro === "Todas" || m.categoria === filtro);
+  // Sort descending by date (newest first)
+  const filas = currentMovimientos()
+    .filter((m) => filtro === "Todas" || m.categoria === filtro)
+    .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.id.localeCompare(a.id));
+    
   document.getElementById("tablaMovimientos").innerHTML = filas
     .map(
       (m) => `
@@ -167,13 +177,13 @@ function renderTabla() {
         </td>
       </tr>`
     )
-    .join("");
+    .join("") || `<tr><td colspan="6" style="text-align: center; padding: 1.5rem;">No hay movimientos este mes.</td></tr>`;
 }
 
 function renderCharts() {
   const ingresosSem = [0, 0, 0, 0];
   const egresosSem = [0, 0, 0, 0];
-  movimientos.forEach((m) => {
+  currentMovimientos().forEach((m) => {
     const i = semanaDelMes(m.fecha);
     if (m.tipo === "ingreso") ingresosSem[i] += m.monto;
     else egresosSem[i] += m.monto;
@@ -229,7 +239,27 @@ function renderCharts() {
 
 }
 
+function renderFiltroMesAnio() {
+  const select = document.getElementById("filtroMesAnio");
+  // Collect unique YYYY-MM
+  const mesesSet = new Set(movimientos.map(m => m.fecha.slice(0, 7)));
+  // Ensure currentMonthYear is always in the list even if empty
+  mesesSet.add(currentMonthYear);
+  
+  const mesesArray = Array.from(mesesSet).sort().reverse();
+  
+  const formatter = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' });
+  
+  select.innerHTML = mesesArray.map(m => {
+    const [year, month] = m.split('-');
+    const date = new Date(year, month - 1, 15);
+    const label = formatter.format(date).replace(/^\w/, c => c.toUpperCase());
+    return `<option value="${m}" ${m === currentMonthYear ? "selected" : ""}>${label}</option>`;
+  }).join("");
+}
+
 function render() {
+  renderFiltroMesAnio();
   renderKpis();
   renderFiltro();
   renderTabla();
@@ -237,6 +267,11 @@ function render() {
 }
 
 const modal = document.getElementById("modal");
+
+document.getElementById("filtroMesAnio").addEventListener("change", (e) => {
+  currentMonthYear = e.target.value;
+  render();
+});
 
 function abrir(item) {
   document.getElementById("modalTitulo").textContent = item ? "Editar movimiento" : "Nuevo movimiento";
