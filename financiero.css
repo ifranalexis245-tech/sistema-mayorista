@@ -13,7 +13,7 @@
 .chart-box { position: relative; height: 260px; }
 .chart-box--wide { height: 280px; }
 
-.gauge-wrap { height: 240px; }
+.gauge-wrap { height: 240px; max-height: 240px; position: relative; }
 .gauge-center {
   position: absolute;
   left: 50%;

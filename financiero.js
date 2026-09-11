@@ -276,6 +276,7 @@ function renderCharts() {
     },
     options: {
       ...common,
+      maintainAspectRatio: false,
       rotation: -90,
       circumference: 180,
       cutout: "78%",
