@@ -339,6 +339,30 @@ document.getElementById("btnLimpiarTodo").addEventListener("click", () => {
 
 render();
 
+function exportarExcelFinanciero() {
+  const filtrados = currentMovimientos();
+  if (filtrados.length === 0) {
+    alert("No hay movimientos en este período para exportar.");
+    return;
+  }
+  
+  let csvContent = "Fecha,Tipo,Categoría,Descripción,Monto\n";
+  filtrados.forEach(m => {
+    const desc = String(m.descripcion || "").replace(/"/g, '""');
+    const cat = String(m.categoria || "").replace(/"/g, '""');
+    csvContent += `"${m.fecha}","${m.tipo.toUpperCase()}","${cat}","${desc}",${m.monto}\n`;
+  });
+  
+  const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `movimientos_financieros_${currentMonthYear}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function descargarRespaldo() {
   const raw = localStorage.getItem(KEY);
   if (!raw) return;
