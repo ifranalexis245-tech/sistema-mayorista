@@ -447,6 +447,25 @@ document.getElementById("formMov").addEventListener("submit", (e) => {
     metodoPago,
     fecha: new Date().toISOString(),
   });
+  
+  // Integración automática con Financiero / Flujo de Caja
+  if (tipo === "salida" && motivo === "Venta") {
+    flujoCaja.push({
+      id: uid("fc-"),
+      tipo: "ingreso",
+      monto: cantidad * (p.precio || 0),
+      detalle: `Venta de stock: ${cantidad} cajas/packs de ${p.nombre}`,
+      fecha: new Date().toISOString().split('T')[0]
+    });
+  } else if (tipo === "entrada" && motivo === "Compra a proveedor") {
+    flujoCaja.push({
+      id: uid("fc-"),
+      tipo: "egreso_prov",
+      monto: cantidad * (p.costo || 0),
+      detalle: `Compra de stock: ${cantidad} cajas/packs de ${p.nombre}`,
+      fecha: new Date().toISOString().split('T')[0]
+    });
+  }
   persist();
   modalMov.close();
   render();
