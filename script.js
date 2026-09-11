@@ -10,7 +10,7 @@ const SEED_MOVS = [];
 
 const esc = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const uid = (p) => p + Date.now().toString(36);
+const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
 const pesos = (n) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
 
 function load() {
@@ -520,6 +520,36 @@ document.getElementById("tablaCaja").addEventListener("click", (e) => {
 
 document.getElementById("cajaFecha").value = HOY.toISOString().split('T')[0];
 
+function cargarDatosDemo() {
+  if (productos.length > 0) return; // Only populate if empty
+  
+  const rawDemo = [
+    { nombre: "Hamburguesas Swift Clásicas", categoria: "Congelados", proveedor: "Swift", vencimiento: "2026-12-10", unidad: "Caja de 48 un", unidades_por_caja: 48, stock: 15, minimo: 5, costo: 22000, margenEsperado: 40 },
+    { nombre: "Salchichas de Viena Paladini", categoria: "Embutidos", proveedor: "Paladini", vencimiento: "2026-11-15", unidad: "Pack de 36 un", unidades_por_caja: 36, stock: 20, minimo: 8, costo: 14500, margenEsperado: 35 },
+    { nombre: "Papas Fritas McCain Corte Tradicional", categoria: "Congelados", proveedor: "McCain", vencimiento: "2027-02-20", unidad: "Caja 6 bolsas x 2.5kg", unidades_por_caja: 6, stock: 3, minimo: 10, costo: 28000, margenEsperado: 45 },
+    { nombre: "Mayonesa Natura Doypack", categoria: "Aderezos", proveedor: "AGD", vencimiento: "2027-05-01", unidad: "Caja de 12 un", unidades_por_caja: 12, stock: 35, minimo: 10, costo: 11000, margenEsperado: 30 },
+    { nombre: "Queso Cheddar en fetas Tonadita", categoria: "Lácteos", proveedor: "Tonadita", vencimiento: "2026-10-30", unidad: "Pack de 192 fetas", unidades_por_caja: 192, stock: 8, minimo: 5, costo: 16000, margenEsperado: 50 },
+    { nombre: "Pan de Hamburguesa Fargo", categoria: "Panificados", proveedor: "Fargo", vencimiento: "2026-09-25", unidad: "Bandeja de 4 un", unidades_por_caja: 4, stock: 50, minimo: 15, costo: 1200, margenEsperado: 60 }
+  ];
+
+  rawDemo.forEach((item, index) => {
+    const sku = "L-" + String(index + 1).padStart(3, "0");
+    const precio = item.costo / (1 - (item.margenEsperado / 100));
+    const gananciaNeta = precio - item.costo;
+    
+    productos.push({
+      id: uid("p-"),
+      sku,
+      ...item,
+      precio,
+      gananciaNeta
+    });
+  });
+  
+  persist();
+}
+
+cargarDatosDemo();
 render();
 
 // --- Seguridad de Datos ---
