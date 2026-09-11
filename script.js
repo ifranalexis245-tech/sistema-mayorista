@@ -1,5 +1,5 @@
 const KEY = "almacen-plantilla";
-const CATEGORIAS = ["Alimentos", "Bebidas", "Fiambres", "Lácteos", "Limpieza", "Varios"];
+const CATEGORIAS = ["Alimentos", "Bebidas", "Fiambres", "Lácteos", "Varios"];
 const MOTIVOS_IN = ["Compra a proveedor", "Ajuste de inventario", "Devolución"];
 const MOTIVOS_OUT = ["Venta", "Merma", "Ajuste de inventario", "Consumo interno"];
 const HOY = new Date(); // Mock date base
@@ -225,11 +225,23 @@ function showError(el, msg) {
   el.textContent = msg || "";
 }
 
+function getNextSku() {
+  if (productos.length === 0) return "L-001";
+  const lSkus = productos
+    .map(p => p.sku)
+    .filter(sku => /^L-\d+$/.test(sku))
+    .map(sku => parseInt(sku.replace("L-", ""), 10))
+    .sort((a, b) => b - a);
+  if (lSkus.length === 0) return "L-001";
+  return "L-" + String(lSkus[0] + 1).padStart(3, '0');
+}
+
 function abrir(item) {
   showError(formError, "");
   document.getElementById("modalTitulo").textContent = item ? "Editar producto / lote" : "Nuevo producto / lote";
   document.getElementById("editId").value = item?.id || "";
-  document.getElementById("sku").value = item?.sku || "";
+  document.getElementById("sku").value = item?.sku || getNextSku();
+  document.getElementById("sku").readOnly = true;
   document.getElementById("nombre").value = item?.nombre || "";
   document.getElementById("vencimiento").value = item?.vencimiento || "";
   document.getElementById("categoria").value = item?.categoria || CATEGORIAS[0];
@@ -239,7 +251,6 @@ function abrir(item) {
   document.getElementById("minimo").value = item?.minimo ?? 0;
   document.getElementById("costo").value = item?.costo ?? 0;
   document.getElementById("precio").value = item?.precio ?? 0;
-  document.getElementById("sku").readOnly = Boolean(item);
   calcularMargen();
   modal.showModal();
 }
