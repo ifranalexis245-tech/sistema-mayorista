@@ -1,0 +1,214 @@
+/* ============================================================
+   ProfesIA — Design Foundations
+   Colors, Typography, Spacing, Radii, Shadows
+   Roboto is SELF-HOSTED below (variable font, weights 100–900 +
+   italics). Just link this stylesheet — no CDN / webfont <link> needed.
+   ============================================================ */
+
+/* ---------- ROBOTO (self-hosted variable fonts) ---------- */
+/* URLs are relative to THIS file (project root), so they resolve
+   correctly however deep the importing HTML lives. */
+@font-face {
+  font-family: "Roboto";
+  src: url("fonts/Roboto-VariableFont_wdth_wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto";
+  src: url("fonts/Roboto-Italic-VariableFont_wdth_wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 100%;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- BRAND CORE ---------- */
+  --orange:      #EF7A1E;   /* primary accent  (RGB 239 122 30) */
+  --navy:        #203E7F;   /* primary brand   (RGB 32 62 127)  */
+  --black:       #000000;
+  --white:       #FFFFFF;
+
+  /* ---------- ORANGE SCALE ---------- */
+  --orange-700:  #B8550E;   /* pressed / deep   */
+  --orange-600:  #D9670F;   /* hover            */
+  --orange-500:  #EF7A1E;   /* base = --orange  */
+  --orange-300:  #F6A862;   /* tint             */
+  --orange-100:  #FCE3CC;   /* wash / highlight bg */
+  --orange-050:  #FDF3E9;   /* faint surface    */
+
+  /* ---------- NAVY SCALE ---------- */
+  --navy-900:    #16294F;   /* deepest          */
+  --navy-700:    #1B356B;   /* pressed          */
+  --navy-600:    #28488C;   /* hover            */
+  --navy-500:    #203E7F;   /* base = --navy    */
+  --navy-300:    #6F86B8;   /* muted            */
+  --navy-100:    #D6DEEE;   /* tint             */
+  --navy-050:    #EEF2F8;   /* faint surface    */
+
+  /* ---------- NEUTRALS (warm-cool balanced) ---------- */
+  --ink:         #15171C;   /* near-black text on light */
+  --gray-800:    #2C2F36;
+  --gray-600:    #565B66;   /* secondary text   */
+  --gray-400:    #9AA0AC;   /* tertiary / placeholder */
+  --gray-300:    #C7CBD3;   /* borders strong   */
+  --gray-200:    #E4E7EC;   /* borders / hairline */
+  --gray-100:    #F1F3F6;   /* surface alt      */
+  --gray-050:    #F8F9FB;   /* page surface     */
+
+  /* ---------- SEMANTIC ---------- */
+  --fg-1:        var(--ink);       /* primary text on light  */
+  --fg-2:        var(--gray-600);  /* secondary text         */
+  --fg-3:        var(--gray-400);  /* tertiary / hints       */
+  --fg-on-dark:  var(--white);     /* primary text on dark   */
+  --fg-on-dark-2:#C9CEDA;          /* secondary text on dark */
+
+  --bg-1:        var(--white);     /* base surface           */
+  --bg-2:        var(--gray-050);  /* page background        */
+  --bg-3:        var(--gray-100);  /* sunken / alt           */
+  --bg-dark:     #0B0E16;          /* dark canvas            */
+  --bg-navy:     var(--navy-500);  /* solid navy surface     */
+
+  --border:      var(--gray-200);
+  --border-strong:var(--gray-300);
+
+  --accent:      var(--orange);    /* default interactive accent */
+  --accent-hover:var(--orange-600);
+  --accent-press:var(--orange-700);
+  --link:        var(--navy-500);
+  --focus-ring:  rgba(239,122,30,.45);
+
+  --success:     #2E9E5B;
+  --warning:     #E4A11B;
+  --danger:      #D64545;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --font-sans:   "Roboto", "Helvetica Neue", Arial, system-ui, sans-serif;
+  /* The "ProfesIA" wordmark is custom lettering — use the logo PNGs, never re-type it. */
+
+  /* weights */
+  --w-regular: 400; /* @kind other */
+  --w-medium:  500; /* @kind other */
+  --w-bold:    700; /* @kind other */
+  --w-black:   900; /* @kind other */
+
+  /* fluid type scale (1.250 major-third), clamp(min, fluid, max) */
+  --t-display: clamp(3rem, 1.6rem + 6vw, 6rem); /* @kind other */
+  --t-h1:      clamp(2.25rem, 1.3rem + 3.6vw, 3.5rem); /* @kind other */
+  --t-h2:      clamp(1.75rem, 1.2rem + 2.2vw, 2.5rem); /* @kind other */
+  --t-h3:      clamp(1.375rem, 1.05rem + 1.2vw, 1.75rem); /* @kind other */
+  --t-h4:      1.25rem;     /* @kind other */
+  --t-lead:    1.25rem; /* @kind other */
+  --t-body:    1rem; /* @kind other */
+  --t-small:   0.875rem;    /* @kind other */
+  --t-caption: 0.75rem;     /* @kind other */
+  --t-eyebrow: 0.8125rem; /* @kind other */
+
+  --lh-tight:  1.04; /* @kind other */
+  --lh-snug:   1.15; /* @kind other */
+  --lh-normal: 1.55; /* @kind other */
+
+  --ls-display: -0.02em; /* @kind other */
+  --ls-eyebrow: 0.14em; /* @kind other */
+
+  /* ---------- SPACING (4px base) ---------- */
+  --sp-1: 0.25rem;  --sp-2: 0.5rem;  --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem;   --sp-6: 2rem;    --sp-8: 3rem;    --sp-10: 4rem;
+  --sp-12: 6rem;    --sp-16: 8rem;
+
+  /* ---------- RADII ---------- */
+  --r-xs: 4px;   --r-sm: 8px;   --r-md: 12px;  --r-lg: 18px;
+  --r-xl: 28px;  --r-pill: 999px;
+
+  /* ---------- SHADOWS / ELEVATION ---------- */
+  --sh-1: 0 1px 2px rgba(21,23,28,.06), 0 1px 1px rgba(21,23,28,.04);
+  --sh-2: 0 4px 12px rgba(21,23,28,.08), 0 1px 3px rgba(21,23,28,.05);
+  --sh-3: 0 12px 32px rgba(21,23,28,.12), 0 4px 10px rgba(21,23,28,.06);
+  --sh-orange: 0 10px 30px rgba(239,122,30,.32);
+  --sh-navy:   0 10px 30px rgba(32,62,127,.28);
+  --glow-light: 0 0 60px rgba(255,255,255,.55);   /* logo glow on dark */
+
+  /* ---------- MOTION ---------- */
+  --ease:      cubic-bezier(.22,.61,.36,1); /* @kind other */
+  --ease-soft: cubic-bezier(.4,0,.2,1); /* @kind other */
+  --dur-fast:  140ms; /* @kind other */
+  --dur:       220ms; /* @kind other */
+  --dur-slow:  420ms; /* @kind other */
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT DEFAULTS
+   (opt-in: wrap content in .profesia-type to apply, or copy rules)
+   ============================================================ */
+.profesia-type {
+  font-family: var(--font-sans);
+  color: var(--fg-1);
+  font-size: var(--t-body);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.profesia-type h1, .display { font-weight: var(--w-black); font-size: var(--t-h1); line-height: var(--lh-snug); letter-spacing: var(--ls-display); }
+.profesia-type h2 { font-weight: var(--w-black); font-size: var(--t-h2); line-height: var(--lh-snug); letter-spacing: var(--ls-display); }
+.profesia-type h3 { font-weight: var(--w-bold);  font-size: var(--t-h3); line-height: var(--lh-snug); }
+.profesia-type h4 { font-weight: var(--w-bold);  font-size: var(--t-h4); line-height: var(--lh-snug); }
+.profesia-type p  { font-weight: var(--w-regular); font-size: var(--t-body); line-height: var(--lh-normal); color: var(--fg-2); }
+.profesia-type a  { color: var(--link); text-decoration: none; }
+.profesia-type a:hover { text-decoration: underline; }
+
+/* Hero statement — the brand's signature huge bold headline */
+.statement {
+  font-family: var(--font-sans);
+  font-weight: var(--w-black);
+  font-size: var(--t-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  text-wrap: balance;
+}
+/* Uppercase statement variant (used on full-bleed gradient slides) */
+.statement--upper { text-transform: uppercase; letter-spacing: 0.005em; }
+
+/* Eyebrow / kicker label */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-weight: var(--w-bold);
+  font-size: var(--t-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+/* Orange word highlight — solid box behind a key word (signature motif) */
+.hl {
+  background: var(--orange);
+  color: var(--white);
+  padding: 0.02em 0.22em;
+  border-radius: var(--r-xs);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.hl--text { color: var(--orange); background: none; padding: 0; } /* just orange ink */
+
+/* Grain overlay — apply to a ::after on gradient surfaces */
+.grain::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("assets/grain.png");
+  background-size: 320px 320px;
+  opacity: .5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Signature soft gradients */
+.bg-grad-light { background:
+  radial-gradient(120% 120% at 0% 100%, var(--orange-100) 0%, transparent 45%),
+  radial-gradient(120% 120% at 100% 0%, var(--navy-050) 0%, transparent 50%),
+  var(--white); }
+.bg-grad-dark { background:
+  radial-gradient(90% 90% at 15% 100%, rgba(239,122,30,.55) 0%, transparent 45%),
+  radial-gradient(80% 80% at 90% 10%, rgba(58,110,210,.55) 0%, transparent 45%),
+  var(--bg-dark); }

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión Almacén</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="branding/colors_and_type.css" />
+  <link rel="stylesheet" href="branding/app.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav__inner">
+      <div class="nav__brand">
+        <span class="nav__mod" style="font-size: 1.5rem; font-weight: bold; margin-left: 0;">Gestión Almacén</span>
+      </div>
+      <span class="badge">Sistema de Gestión</span>
+    </div>
+    <div class="nav__bar"></div>
+  </nav>
+  <header class="page-head">
+    <h1>Control de Stock y Vencimientos</h1>
+    <p>Gestión de productos, lotes y movimientos de entrada / salida</p>
+  </header>
+
+  <main>
+    <section class="kpis cuatro" id="kpis"></section>
+
+    <section class="layout">
+      <article class="panel">
+        <div class="panel-head row">
+          <div>
+            <h2>Productos</h2>
+            <p>Control de inventario y fechas de vencimiento</p>
+          </div>
+          <div class="acciones">
+            <button type="button" class="ghost danger" id="btnBorrarSel" hidden>Borrar seleccionados</button>
+            <button type="button" id="btnNuevo">Nuevo producto</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="Buscar código, producto o proveedor" />
+          <select id="filtroCat"></select>
+          <select id="filtroProv"></select>
+          <select id="filtroEstado">
+            <option value="todos">Todos los estados</option>
+            <option value="ok">OK</option>
+            <option value="reponer">A reponer</option>
+            <option value="vencer">Próximo a vencer</option>
+          </select>
+        </div>
+
+        <div class="tabla-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="check"><input type="checkbox" id="checkAll" /></th>
+                <th><button type="button" class="th-sort" data-sort="sku">Cód/Lote</button></th>
+                <th><button type="button" class="th-sort" data-sort="nombre">Producto</button></th>
+                <th><button type="button" class="th-sort" data-sort="vencimiento">Vencimiento</button></th>
+                <th>Categoría</th>
+                <th>Proveedor</th>
+                <th class="num"><button type="button" class="th-sort" data-sort="stock">Stock</button></th>
+                <th class="num">Mín.</th>
+                <th>Estado</th>
+                <th>ABM</th>
+              </tr>
+            </thead>
+            <tbody id="tablaStock"></tbody>
+          </table>
+        </div>
+        <p class="hint" id="tablaHint"></p>
+      </article>
+
+      <aside class="side">
+        <article class="panel" id="panelLista"></article>
+        <article class="panel" id="panelMovs"></article>
+      </aside>
+    </section>
+
+    <section class="seguridad-datos" style="margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--border); text-align: center; border-radius: var(--r-md); background: var(--panel);">
+      <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: var(--fg-1);">Seguridad de Datos</h3>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="sm ghost" onclick="exportarExcel()">Exportar a Excel (CSV)</button>
+        <button type="button" class="sm ghost" onclick="descargarRespaldo()">Descargar Respaldo JSON</button>
+        <button type="button" class="sm ghost" onclick="document.getElementById('fileRestaurar').click()">Restaurar Respaldo</button>
+        <input type="file" id="fileRestaurar" accept=".json" style="display: none;" onchange="restaurarRespaldo(event)" />
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal wide" id="modal">
+    <form id="formAbm">
+      <h2 id="modalTitulo">Nuevo producto / lote</h2>
+      <p class="form-error" id="formError" hidden></p>
+      <input type="hidden" id="editId" />
+      <div class="form-grid">
+        <label>Cód/Lote <input type="text" id="sku" required placeholder="L-001" /></label>
+        <label>Categoría
+          <select id="categoria"></select>
+        </label>
+        <label class="full">Producto <input type="text" id="nombre" required /></label>
+        <label>Fecha de Vencimiento <input type="date" id="vencimiento" required /></label>
+        <label>Proveedor <input type="text" id="proveedor" list="listaProveedores" /></label>
+        <label>Unidad
+          <select id="unidad">
+            <option>Unidad suelta</option>
+            <option>Kilogramos (kg)</option>
+            <option>Litros (L)</option>
+          </select>
+        </label>
+        <label>CANTIDAD QUE INGRESA <input type="number" id="stock" min="0" step="0.01" required /></label>
+        <label style="display: flex; flex-direction: column;">Stock mínimo <input type="number" id="minimo" min="0" step="0.01" required />
+          <small style="font-size: 0.7em; color: gray; font-weight: normal; margin-top: 2px;">(Avisa al llegar a esta cantidad)</small>
+        </label>
+        <label>Costo por Unidad (ARS) <input type="number" id="costo" min="0" required /></label>
+        <label>Remarcación (%) <input type="number" id="porcentaje" min="0" required /></label>
+        <label class="full">Precio de Venta (ARS) <input type="number" id="precio" min="0" required /></label>
+      </div>
+      <datalist id="listaProveedores"></datalist>
+      <div class="modal-acciones">
+        <button type="submit">Guardar</button>
+        <button type="button" class="ghost" id="btnCancelar">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="modalMov">
+    <form id="formMov">
+      <h2 id="movTitulo">Movimiento de stock</h2>
+      <p class="hint" id="movProducto"></p>
+      <p class="form-error" id="movError" hidden></p>
+      <input type="hidden" id="movId" />
+      <input type="hidden" id="movTipo" />
+      <label>Cantidad <input type="number" id="movCantidad" min="0.01" step="0.01" value="1" required /></label>
+      <label>Motivo
+        <select id="movMotivo"></select>
+      </label>
+      <label id="labelMetodoPago" hidden>Método de Pago
+        <select id="movMetodoPago">
+          <option>Efectivo</option>
+          <option>Transferencia</option>
+          <option>Tarjeta</option>
+        </select>
+      </label>
+      <div class="modal-acciones">
+        <button type="submit">Registrar</button>
+        <button type="button" class="ghost" id="btnCancelarMov">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>

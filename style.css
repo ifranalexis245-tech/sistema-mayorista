@@ -1,0 +1,86 @@
+.kpis.cuatro { grid-template-columns: repeat(4, 1fr); }
+.layout { grid-template-columns: 1.75fr 0.85fr; }
+.layout .panel { margin-bottom: 0; }
+.side { display: grid; gap: 1rem; }
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.9fr 0.8fr;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+.toolbar input, .toolbar select { margin-top: 0; }
+
+.check { width: 36px; }
+.check input { width: auto; margin: 0; }
+.th-sort {
+  background: none;
+  border: 0;
+  color: var(--fg-3);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.th-sort:hover { background: none; color: var(--navy); transform: none; box-shadow: none; }
+
+.stock-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+.stock-cell strong { min-width: 1.6rem; text-align: right; }
+
+tr.bajo { background: #fdecea; }
+.pill.ok { background: #e8f6ee; color: var(--success); }
+.pill.reponer { background: #fdecea; color: var(--danger); }
+
+.sku { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--fg-2); font-weight: 600; }
+.prod-meta { display: block; font-size: 0.75rem; color: var(--fg-3); font-weight: 500; }
+.precio-venta { font-size: 1.1em; font-weight: bold; color: #006633; }
+
+.lista { list-style: none; margin-top: 0.8rem; display: grid; gap: 0.55rem; }
+.lista li {
+  background: var(--gray-050);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.7rem 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.lista strong { color: var(--danger); }
+.movs { list-style: none; margin-top: 0.7rem; display: grid; gap: 0.45rem; }
+.movs li { font-size: 0.82rem; color: var(--fg-2); padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+.movs b.entrada { color: var(--success); }
+.movs b.salida { color: var(--danger); }
+
+dialog.modal.wide { width: min(640px, 94vw); }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.8rem;
+}
+.form-grid .full { grid-column: 1 / -1; }
+.form-error {
+  background: #fdecea;
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+}
+
+@media (max-width: 1100px) {
+  .kpis.cuatro, .toolbar { grid-template-columns: 1fr 1fr; }
+  .layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .toolbar, .form-grid { grid-template-columns: 1fr; }
+}
