@@ -570,3 +570,26 @@ function restaurarRespaldo(event) {
   };
   reader.readAsText(file);
 }
+
+const FECHA_VENCIMIENTO_LICENCIA = "2026-10-10";
+
+function checkLicencia() {
+  const hoy = new Date().toISOString().split('T')[0];
+  if (hoy > FECHA_VENCIMIENTO_LICENCIA) {
+    document.body.innerHTML = `
+      <div style="position: fixed; top:0; left:0; width:100%; height:100%; background:#f8fafc; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; font-family: 'Poppins', sans-serif;">
+        <h1 style="color:var(--danger, #d32f2f); font-size: 2rem; margin-bottom:1rem;">Acceso Suspendido</h1>
+        <p style="font-size: 1.1rem; color: var(--fg-2, #475569); max-width: 500px; line-height: 1.5; margin-bottom:2rem;">
+          El período de prueba / suscripción ha finalizado. Por favor, contacte al administrador para renovar su acceso.
+        </p>
+        <button type="button" onclick="descargarRespaldo()" style="background:var(--navy, #203E7F); color:white; border:none; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: var(--r-md, 8px); cursor:pointer; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          Descargar Respaldo (JSON)
+        </button>
+      </div>
+    `;
+    return false;
+  }
+  return true;
+}
+
+checkLicencia();
