@@ -340,24 +340,37 @@ document.getElementById("btnLimpiarTodo").addEventListener("click", () => {
 render();
 
 function exportarExcelFinanciero() {
-  const filtrados = currentMovimientos();
-  if (filtrados.length === 0) {
+  const tbody = document.getElementById("tablaMovimientos");
+  const filas = Array.from(tbody.querySelectorAll("tr"));
+  
+  if (filas.length === 0 || filas[0].innerText.includes("No hay movimientos")) {
     alert("No hay movimientos en este período para exportar.");
     return;
   }
   
   let csvContent = "\uFEFFFecha;Tipo;Categoría;Descripción;Monto\n";
-  filtrados.forEach(m => {
-    const desc = String(m.descripcion || "").replace(/"/g, '""');
-    const cat = String(m.categoria || "").replace(/"/g, '""');
-    csvContent += `"${m.fecha}";"${m.tipo.toUpperCase()}";"${cat}";"${desc}";${m.monto}\n`;
+  
+  filas.forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length >= 5) {
+      const fecha = tds[0].innerText.trim();
+      const tipo = tds[1].innerText.trim();
+      const categoria = String(tds[2].innerText).replace(/"/g, '""').trim();
+      const descripcion = String(tds[3].innerText).replace(/"/g, '""').trim();
+      
+      // Convert formatted currency back to number string or keep as is? 
+      // Safest is to export the raw text exactly as requested: "Monto"
+      const monto = String(tds[4].innerText).replace(/"/g, '""').trim();
+      
+      csvContent += `"${fecha}";"${tipo}";"${categoria}";"${descripcion}";"${monto}"\n`;
+    }
   });
   
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", `movimientos_financieros_${currentMonthYear}.csv`);
+  link.setAttribute("download", `movimientos_financieros_${currentMonthYear || 'export'}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
