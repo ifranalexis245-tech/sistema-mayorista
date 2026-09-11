@@ -19,7 +19,10 @@
       </div>
       <span class="badge">Sistema de Gestión</span>
     </div>
-    <div class="nav__bar"></div>
+    <div class="nav__menu" style="display: flex; gap: 1.5rem; justify-content: center; background: rgba(0,0,0,0.1); padding: 0.8rem 2rem;">
+      <a href="index.html" style="color: white; font-weight: bold; text-decoration: none; font-size: 0.95rem; border-bottom: 2px solid white; padding-bottom: 0.2rem;">📦 Stock y Operaciones</a>
+      <a href="financiero.html" style="color: rgba(255,255,255,0.7); font-weight: bold; text-decoration: none; font-size: 0.95rem;">📈 Reportes Financieros</a>
+    </div>
   </nav>
   <header class="page-head">
     <h1>Control de Stock y Vencimientos</h1>
@@ -80,6 +83,57 @@
         <article class="panel" id="panelLista"></article>
         <article class="panel" id="panelMovs"></article>
       </aside>
+    </section>
+
+    <section class="layout" style="margin-top: 2rem; display: block;">
+      <article class="panel">
+        <div class="panel-head row">
+          <div>
+            <h2>Flujo de Caja Diaria</h2>
+            <p>Control de ingresos y egresos de dinero</p>
+          </div>
+        </div>
+        
+        <div class="kpis tres" id="kpisCaja" style="margin-bottom: 1.5rem;">
+          <!-- KPIs de caja -->
+        </div>
+
+        <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
+          <form id="formCaja" style="flex: 1; min-width: 300px; background: var(--bg); padding: 1.5rem; border-radius: var(--r-md); border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">Registrar Movimiento</h3>
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+              <label>Tipo de Movimiento
+                <select id="cajaTipo" required>
+                  <option value="ingreso">Ingreso por Ventas</option>
+                  <option value="egreso_prov">Pago a Proveedores</option>
+                  <option value="egreso_gasto">Gastos del Local</option>
+                </select>
+              </label>
+              <label>Monto ($) <input type="number" id="cajaMonto" min="0.01" step="0.01" required /></label>
+              <label>Concepto/Detalle <input type="text" id="cajaDetalle" placeholder="Ej: Venta, Luz, Mercadería..." required /></label>
+              <label>Fecha <input type="date" id="cajaFecha" required /></label>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+              <button type="submit">Guardar Movimiento</button>
+            </div>
+          </form>
+
+          <div class="tabla-wrap" style="flex: 2; min-width: 400px; max-height: 400px; overflow-y: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Detalle</th>
+                  <th class="num">Monto</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tablaCaja"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
     </section>
 
     <section class="seguridad-datos" style="margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--border); text-align: center; border-radius: var(--r-md); background: var(--panel);">

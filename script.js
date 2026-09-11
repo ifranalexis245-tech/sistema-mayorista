@@ -19,18 +19,19 @@ function load() {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (_) {}
-  return { productos: SEED_PRODUCTOS, movimientos: SEED_MOVS };
+  return { productos: SEED_PRODUCTOS, movimientos: SEED_MOVS, flujoCaja: [] };
 }
 
 const store = load();
-let productos = store.productos;
-let movimientos = store.movimientos;
+let productos = store.productos || [];
+let movimientos = store.movimientos || [];
+let flujoCaja = store.flujoCaja || [];
 let sortKey = "nombre";
 let sortDir = 1;
 let seleccion = new Set();
 
 function persist() {
-  localStorage.setItem(KEY, JSON.stringify({ productos, movimientos }));
+  localStorage.setItem(KEY, JSON.stringify({ productos, movimientos, flujoCaja }));
 }
 
 function bajo(p) {
@@ -169,12 +170,49 @@ function renderMovs() {
   document.getElementById("panelMovs").innerHTML = `<h2>Últimos movimientos</h2><ul class="movs">${items}</ul>`;
 }
 
+function renderCaja() {
+  let totalIngresos = 0;
+  let totalEgresos = 0;
+  
+  const rows = [...flujoCaja].sort((a, b) => b.fecha.localeCompare(a.fecha) || b.id.localeCompare(a.id)).map(m => {
+    const isIngreso = m.tipo === "ingreso";
+    if (isIngreso) totalIngresos += m.monto;
+    else totalEgresos += m.monto;
+    
+    const fechaFmt = m.fecha.split('-').reverse().join('/');
+    const tipoMap = { ingreso: "Venta", egreso_prov: "Pago Prov.", egreso_gasto: "Gasto" };
+    const tipoFmt = tipoMap[m.tipo] || (isIngreso ? "Ingreso" : "Egreso");
+    const color = isIngreso ? "var(--success)" : "var(--danger)";
+    const signo = isIngreso ? "+" : "−";
+    
+    return `
+      <tr>
+        <td>${fechaFmt}</td>
+        <td><span class="pill" style="color: ${color}; background: transparent; border: 1px solid ${color};">${tipoFmt}</span></td>
+        <td>${esc(m.detalle)}</td>
+        <td class="num" style="color: ${color}; font-weight: bold;">${signo}${pesos(m.monto)}</td>
+        <td><button type="button" class="sm danger" data-del-caja="${m.id}">×</button></td>
+      </tr>
+    `;
+  });
+  
+  document.getElementById("tablaCaja").innerHTML = rows.join("") || `<tr><td colspan="5">No hay movimientos registrados.</td></tr>`;
+  
+  const balance = totalIngresos - totalEgresos;
+  document.getElementById("kpisCaja").innerHTML = `
+    <article class="kpi"><span>Total Ingresos</span><strong style="color: var(--success);">${pesos(totalIngresos)}</strong></article>
+    <article class="kpi"><span>Total Egresos</span><strong style="color: var(--danger);">${pesos(totalEgresos)}</strong></article>
+    <article class="kpi"><span>Balance Neto</span><strong style="color: ${balance >= 0 ? 'var(--success)' : 'var(--danger)'};">${pesos(balance)}</strong></article>
+  `;
+}
+
 function render() {
   renderFiltros();
   renderKpis();
   renderTabla();
   renderLista();
   renderMovs();
+  renderCaja();
 }
 
 const modal = document.getElementById("modal");
@@ -384,6 +422,37 @@ document.getElementById("tablaStock").addEventListener("change", (e) => {
   renderTabla();
 });
 
+document.getElementById("formCaja").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = document.getElementById("cajaTipo").value;
+  const monto = Number(document.getElementById("cajaMonto").value);
+  const detalle = document.getElementById("cajaDetalle").value.trim();
+  const fecha = document.getElementById("cajaFecha").value;
+  
+  flujoCaja.push({
+    id: uid("fc-"),
+    tipo,
+    monto,
+    detalle,
+    fecha
+  });
+  persist();
+  renderCaja();
+  e.target.reset();
+  document.getElementById("cajaFecha").value = HOY.toISOString().split('T')[0];
+});
+
+document.getElementById("tablaCaja").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-del-caja]");
+  if (btn && confirm("¿Borrar este movimiento de caja?")) {
+    flujoCaja = flujoCaja.filter(m => m.id !== btn.dataset.delCaja);
+    persist();
+    renderCaja();
+  }
+});
+
+document.getElementById("cajaFecha").value = HOY.toISOString().split('T')[0];
+
 render();
 
 // --- Seguridad de Datos ---
@@ -403,6 +472,12 @@ function exportarExcel() {
     csvContent += `"${m.fecha}","${m.tipo}",${m.cantidad},"${prodName}","${m.motivo}","${m.metodoPago||''}"\n`;
   });
 
+  csvContent += "\n=== FLUJO DE CAJA ===\n";
+  csvContent += "Fecha,Tipo,Detalle,Monto\n";
+  flujoCaja.forEach(m => {
+    csvContent += `"${m.fecha}","${m.tipo}","${m.detalle}",${m.monto}\n`;
+  });
+
   const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -414,7 +489,7 @@ function exportarExcel() {
 }
 
 function descargarRespaldo() {
-  const data = JSON.stringify({ productos, movimientos });
+  const data = JSON.stringify({ productos, movimientos, flujoCaja });
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -433,6 +508,7 @@ function restaurarRespaldo(event) {
     try {
       const parsed = JSON.parse(e.target.result);
       if (parsed.productos && parsed.movimientos) {
+        if (!parsed.flujoCaja) parsed.flujoCaja = [];
         localStorage.setItem(KEY, JSON.stringify(parsed));
         alert("Respaldo restaurado con éxito. La página se recargará.");
         location.reload();

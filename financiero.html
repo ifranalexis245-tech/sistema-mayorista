@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reportes Financieros - Mayorista</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="financiero.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav__inner">
+      <div class="nav__brand">
+        <span class="nav__mod" style="font-size: 1.5rem; font-weight: bold; margin-left: 0;">Control de Inventario y Flujo de Caja</span>
+      </div>
+      <span class="badge">Sistema de Gestión</span>
+    </div>
+    <div class="nav__menu" style="display: flex; gap: 1.5rem; justify-content: center; background: rgba(0,0,0,0.1); padding: 0.8rem 2rem;">
+      <a href="index.html" style="color: rgba(255,255,255,0.7); font-weight: bold; text-decoration: none; font-size: 0.95rem;">📦 Stock y Operaciones</a>
+      <a href="financiero.html" style="color: white; font-weight: bold; text-decoration: none; font-size: 0.95rem; border-bottom: 2px solid white; padding-bottom: 0.2rem;">📈 Reportes Financieros</a>
+    </div>
+  </nav>
+  <header class="page-head">
+    <h1>Análisis Financiero</h1>
+    <p>Balance, márgenes y métricas de flujo de caja</p>
+  </header>
+
+  <main>
+    <section class="kpis" id="kpis"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Ingresos vs. egresos por semana</h2>
+        <p>Evolución semanal · Análisis de liquidez para Promo Fiesta</p>
+      </div>
+      <div class="chart-box chart-box--wide">
+        <canvas id="chartSemanas"></canvas>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Balance acumulado</h2>
+          <p>Curva de rendimiento · Cómo va quedando el saldo disponible diario</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartLinea"></canvas>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Flujo acumulado</h2>
+          <p>Volumen histórico · Crecimiento paralelo de ingresos y egresos</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartArea"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <section class="charts-grid tres">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Ingresos por categoría</h2>
+          <p>Distribución de ventas por canales o métodos</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartTorta"></canvas>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Egresos por categoría</h2>
+          <p>Proveedores vs. Gastos Operativos</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartDona"></canvas>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Gasto sobre ingresos</h2>
+          <p>Margen de quema · % de lo que entró que ya se usó para reponer</p>
+        </div>
+        <div class="chart-box gauge-wrap">
+          <canvas id="chartGauge"></canvas>
+          <div class="gauge-center" id="gaugeLabel"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="charts-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Ranking de categorías</h2>
+          <p>Comparativa total de volumen de dinero movido</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartHorizontal"></canvas>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Peso de cada rubro</h2>
+          <p>Impacto relativo de ingresos y egresos juntos</p>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartPolar"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head row">
+        <div>
+          <h2>Movimientos de Caja</h2>
+          <p>Filtrá por categoría para auditar compras a proveedores o ventas diarias</p>
+        </div>
+        <div class="head-actions">
+          <label class="filtro">
+            Categoría
+            <select id="filtroCategoria"></select>
+          </label>
+          <button type="button" id="btnNuevo">Registrar movimiento</button>
+        </div>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Categoría</th>
+              <th>Detalle (Cajas/Packs, Cliente)</th>
+              <th class="num">Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMovimientos"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="modal">
+    <form id="formAbm">
+      <h2 id="modalTitulo">Nuevo movimiento</h2>
+      <input type="hidden" id="editId" />
+      <input type="hidden" id="tipo" value="ingreso" />
+      <label>Fecha <input type="date" id="fecha" required /></label>
+      <label>Tipo de Movimiento
+        <select id="categoria" required>
+          <option>Ingresos por Ventas</option>
+          <option>Pago a Proveedores</option>
+          <option>Gastos del Local</option>
+        </select>
+      </label>
+      <label>Detalle <input type="text" id="descripcion" placeholder="Ej: 10 Cajas/Packs de Patys, Pago a proveedor" required /></label>
+      <label>Monto ($) <input type="number" id="monto" min="1" step="0.01" required /></label>
+      <div class="modal-acciones">
+        <button type="submit">Guardar</button>
+        <button type="button" class="ghost" id="btnCancelar">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="financiero.js"></script>
+</body>
+</html>
