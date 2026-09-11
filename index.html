@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestión Almacén</title>
+  <title>Control de Inventario y Flujo de Caja</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
@@ -15,7 +15,7 @@
   <nav class="nav">
     <div class="nav__inner">
       <div class="nav__brand">
-        <span class="nav__mod" style="font-size: 1.5rem; font-weight: bold; margin-left: 0;">Gestión Almacén</span>
+        <span class="nav__mod" style="font-size: 1.5rem; font-weight: bold; margin-left: 0;">Control de Inventario y Flujo de Caja</span>
       </div>
       <span class="badge">Sistema de Gestión</span>
     </div>
@@ -106,18 +106,14 @@
         <label class="full">Producto <input type="text" id="nombre" required /></label>
         <label>Fecha de Vencimiento <input type="date" id="vencimiento" required /></label>
         <label>Proveedor <input type="text" id="proveedor" list="listaProveedores" /></label>
-        <label>Unidad
-          <select id="unidad">
-            <option>Unidad suelta</option>
-            <option>Kilogramos (kg)</option>
-            <option>Litros (L)</option>
-          </select>
+        <label>Formato de Venta (Bulto)
+          <input type="text" id="unidad" placeholder="Ej: Caja de 6, Pack de 24" required />
         </label>
-        <label>CANTIDAD QUE INGRESA <input type="number" id="stock" min="0" step="0.01" required /></label>
-        <label style="display: flex; flex-direction: column;">Stock mínimo <input type="number" id="minimo" min="0" step="0.01" required />
+        <label>BULTOS QUE INGRESAN <input type="number" id="stock" min="0" step="1" required /></label>
+        <label style="display: flex; flex-direction: column;">Stock mínimo (Bultos) <input type="number" id="minimo" min="0" step="1" required />
           <small style="font-size: 0.7em; color: gray; font-weight: normal; margin-top: 2px;">(Avisa al llegar a esta cantidad)</small>
         </label>
-        <label>Costo por Unidad (ARS) <input type="number" id="costo" min="0" required /></label>
+        <label>Costo por Bulto (ARS) <input type="number" id="costo" min="0" step="0.01" required /></label>
         <label>Remarcación (%) <input type="number" id="porcentaje" min="0" required /></label>
         <label class="full">Precio de Venta (ARS) <input type="number" id="precio" min="0" required /></label>
       </div>
@@ -136,7 +132,7 @@
       <p class="form-error" id="movError" hidden></p>
       <input type="hidden" id="movId" />
       <input type="hidden" id="movTipo" />
-      <label>Cantidad <input type="number" id="movCantidad" min="0.01" step="0.01" value="1" required /></label>
+      <label>Cantidad (Bultos) <input type="number" id="movCantidad" min="1" step="1" value="1" required /></label>
       <label>Motivo
         <select id="movMotivo"></select>
       </label>

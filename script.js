@@ -90,7 +90,7 @@ function renderKpis() {
   document.getElementById("kpis").innerHTML = `
     <article class="kpi"><span>SKUs</span><strong>${productos.length}</strong></article>
     <article class="kpi"><span>Por debajo del mínimo</span><strong>${bajos.length}</strong></article>
-    <article class="kpi"><span>Unidades a reponer</span><strong>${bajos.reduce((a, p) => a + (p.minimo - p.stock), 0)}</strong></article>
+    <article class="kpi"><span>Bultos a reponer</span><strong>${bajos.reduce((a, p) => a + (p.minimo - p.stock), 0)}</strong></article>
     <article class="kpi"><span>Valor en stock</span><strong>${pesos(valor)}</strong></article>
   `;
 }
@@ -196,7 +196,7 @@ function abrir(item) {
   document.getElementById("vencimiento").value = item?.vencimiento || "";
   document.getElementById("categoria").value = item?.categoria || CATEGORIAS[0];
   document.getElementById("proveedor").value = item?.proveedor || "";
-  document.getElementById("unidad").value = item?.unidad || "unidad";
+  document.getElementById("unidad").value = item?.unidad || "";
   document.getElementById("stock").value = item?.stock ?? 0;
   document.getElementById("minimo").value = item?.minimo ?? 0;
   document.getElementById("costo").value = item?.costo ?? 0;
@@ -337,7 +337,7 @@ document.getElementById("formMov").addEventListener("submit", (e) => {
   const p = productos.find((x) => x.id === id);
   if (!p || cantidad < 1) return;
   if (tipo === "salida" && cantidad > p.stock) {
-    showError(movError, `No hay stock suficiente. Hay ${p.stock} ${p.unidad}(s).`);
+    showError(movError, `No hay stock suficiente. Hay ${p.stock} bulto(s) de ${p.unidad}.`);
     return;
   }
   p.stock = tipo === "entrada" ? p.stock + cantidad : p.stock - cantidad;
