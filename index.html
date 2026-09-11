@@ -164,13 +164,15 @@
           <input type="text" id="unidad" placeholder="Ej: Caja de 6, Pack de 24" required />
         </label>
         <label>CAJAS/PACKS QUE INGRESAN <input type="number" id="stock" min="0" step="1" required /></label>
+        <label>Unidades por Caja/Pack <input type="number" id="unidadesPorCaja" min="1" step="1" value="1" required /></label>
+        <label>Total de Unidades Sueltas <input type="text" id="totalSueltas" readonly style="background: var(--bg); color: var(--fg-2); cursor: not-allowed;" tabindex="-1" /></label>
         <label style="display: flex; flex-direction: column;">Stock mínimo (Cajas/Packs) <input type="number" id="minimo" min="0" step="1" required />
           <small style="font-size: 0.7em; color: gray; font-weight: normal; margin-top: 2px;">(Avisa al llegar a esta cantidad)</small>
         </label>
         <label>Precio de Costo (Caja/Pack) <input type="number" id="costo" min="0" step="0.01" required /></label>
-        <label>Precio de Venta Final (ARS) <input type="number" id="precio" min="0" step="0.01" required /></label>
-        <label>Ganancia Neta ($) <input type="text" id="gananciaNeta" readonly style="background: var(--bg); color: var(--fg-2);" tabindex="-1" /></label>
-        <label>Margen Bruto Real (%) <input type="text" id="margenBruto" readonly style="background: var(--bg); color: var(--fg-2);" tabindex="-1" /></label>
+        <label>Margen de Ganancia Esperado (%) <input type="number" id="margenEsperado" min="0" step="0.01" required /></label>
+        <label>Precio de Venta Final ($) <input type="text" id="precio" readonly style="background: var(--bg); color: var(--fg-2); cursor: not-allowed;" tabindex="-1" required /></label>
+        <label>Ganancia Neta ($) <input type="text" id="gananciaNeta" readonly style="background: var(--bg); color: var(--fg-2); cursor: not-allowed;" tabindex="-1" /></label>
       </div>
       <datalist id="listaProveedores"></datalist>
       <div class="modal-acciones">

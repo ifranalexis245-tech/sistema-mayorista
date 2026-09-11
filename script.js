@@ -108,14 +108,17 @@ function renderTabla() {
       <tr class="${crit ? "bajo" : ""} ${vence ? "bajo" : ""}">
         <td class="check"><input type="checkbox" data-check="${p.id}" ${seleccion.has(p.id) ? "checked" : ""} /></td>
         <td class="sku">${esc(p.sku)}</td>
-        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">$${p.precio}</span> · Ganancia: $${p.gananciaNeta || 0} (${p.margenBruto || 0}%)</span></td>
+        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">$${p.precio}</span> · Ganancia: $${p.gananciaNeta || 0} (${p.margenEsperado || p.margenBruto || 0}%)</span></td>
         <td style="${vence ? 'color: red; font-weight: bold;' : ''}">${fechaVencFmt}</td>
         <td>${esc(p.categoria)}</td>
         <td>${esc(p.proveedor)}</td>
         <td>
           <div class="stock-cell">
             <button type="button" class="sm ghost" data-out="${p.id}">−</button>
-            <strong>${p.stock}</strong>
+            <div style="text-align: center; display: flex; flex-direction: column; min-width: 4rem;">
+              <strong>${p.stock} Cajas</strong>
+              <small style="font-size: 0.7em; color: var(--fg-3);">(${(p.stock * (p.unidades_por_caja || 1))} un)</small>
+            </div>
             <button type="button" class="sm" data-in="${p.id}">+</button>
           </div>
         </td>
@@ -248,11 +251,24 @@ function abrir(item) {
   document.getElementById("proveedor").value = item?.proveedor || "";
   document.getElementById("unidad").value = item?.unidad || "";
   document.getElementById("stock").value = item?.stock ?? 0;
+  document.getElementById("unidadesPorCaja").value = item?.unidades_por_caja ?? 1;
   document.getElementById("minimo").value = item?.minimo ?? 0;
   document.getElementById("costo").value = item?.costo ?? 0;
-  document.getElementById("precio").value = item?.precio ?? 0;
-  calcularMargen();
+  let margen = item?.margenEsperado ?? 30; // Default 30% margin for new items
+  if (item && item.precio && item.costo && !item.margenEsperado) {
+    margen = ((item.precio - item.costo) / item.costo) * 100;
+  }
+  document.getElementById("margenEsperado").value = Number(margen.toFixed(2));
+  
+  calcularPrecioFinal();
+  calcularSueltas();
   modal.showModal();
+}
+
+function calcularSueltas() {
+  const stock = Number(document.getElementById("stock").value);
+  const upc = Number(document.getElementById("unidadesPorCaja").value);
+  document.getElementById("totalSueltas").value = (stock * upc) + " unidades";
 }
 
 function abrirMov(producto, tipo) {
@@ -274,22 +290,25 @@ document.getElementById("movMotivo").addEventListener("change", (e) => {
   document.getElementById("labelMetodoPago").hidden = !isVenta;
 });
 
-function calcularMargen() {
+function calcularPrecioFinal() {
   const costo = Number(document.getElementById("costo").value);
-  const precio = Number(document.getElementById("precio").value);
-  if (precio > 0) {
-    const ganancia = precio - costo;
-    const margen = (ganancia / precio) * 100;
+  const margen = Number(document.getElementById("margenEsperado").value);
+  
+  if (costo >= 0 && margen >= 0) {
+    const precioFinal = costo + (costo * margen / 100);
+    const ganancia = precioFinal - costo;
+    document.getElementById("precio").value = pesos(precioFinal);
     document.getElementById("gananciaNeta").value = pesos(ganancia);
-    document.getElementById("margenBruto").value = margen.toFixed(2) + '%';
   } else {
+    document.getElementById("precio").value = "$0";
     document.getElementById("gananciaNeta").value = "$0";
-    document.getElementById("margenBruto").value = "0%";
   }
 }
 
-document.getElementById("costo").addEventListener("input", calcularMargen);
-document.getElementById("precio").addEventListener("input", calcularMargen);
+document.getElementById("costo").addEventListener("input", calcularPrecioFinal);
+document.getElementById("margenEsperado").addEventListener("input", calcularPrecioFinal);
+document.getElementById("stock").addEventListener("input", calcularSueltas);
+document.getElementById("unidadesPorCaja").addEventListener("input", calcularSueltas);
 
 function borrarIds(ids) {
   productos = productos.filter((p) => !ids.includes(p.id));
@@ -341,15 +360,18 @@ document.getElementById("formAbm").addEventListener("submit", (e) => {
     return;
   }
   const stock = Number(document.getElementById("stock").value);
+  const unidades_por_caja = Number(document.getElementById("unidadesPorCaja").value) || 1;
   const minimo = Number(document.getElementById("minimo").value);
   const costo = Number(document.getElementById("costo").value);
-  const precio = Number(document.getElementById("precio").value);
-  if (stock < 0 || minimo < 0 || costo < 0 || precio < 0) {
-    showError(formError, "Stock, mínimo, costo y precio no pueden ser negativos.");
+  const margenEsperado = Number(document.getElementById("margenEsperado").value);
+  const precio = costo + (costo * margenEsperado / 100);
+  
+  if (stock < 0 || unidades_por_caja < 1 || minimo < 0 || costo < 0 || margenEsperado < 0) {
+    showError(formError, "Valores numéricos inválidos.");
     return;
   }
   const gananciaNeta = precio > 0 ? (precio - costo) : 0;
-  const margenBruto = precio > 0 ? Number(((gananciaNeta / precio) * 100).toFixed(2)) : 0;
+  
   const item = {
     id,
     sku,
@@ -359,11 +381,12 @@ document.getElementById("formAbm").addEventListener("submit", (e) => {
     proveedor: document.getElementById("proveedor").value.trim(),
     unidad: document.getElementById("unidad").value,
     stock,
+    unidades_por_caja,
     minimo,
     costo,
     precio,
     gananciaNeta,
-    margenBruto,
+    margenEsperado,
   };
   const i = productos.findIndex((p) => p.id === id);
   const anterior = i >= 0 ? productos[i] : null;
