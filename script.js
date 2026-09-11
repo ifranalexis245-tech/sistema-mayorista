@@ -256,7 +256,7 @@ function abrir(item) {
   document.getElementById("costo").value = item?.costo ?? 0;
   let margen = item?.margenEsperado ?? 30; // Default 30% margin for new items
   if (item && item.precio && item.costo && !item.margenEsperado) {
-    margen = ((item.precio - item.costo) / item.costo) * 100;
+    margen = (1 - (item.costo / item.precio)) * 100;
   }
   document.getElementById("margenEsperado").value = Number(margen.toFixed(2));
   
@@ -294,8 +294,17 @@ function calcularPrecioFinal() {
   const costo = Number(document.getElementById("costo").value);
   const margen = Number(document.getElementById("margenEsperado").value);
   
+  if (margen >= 100) {
+    showError(formError, "El margen de ganancia debe ser menor al 100%.");
+    document.getElementById("precio").value = "$0";
+    document.getElementById("gananciaNeta").value = "$0";
+    return;
+  } else {
+    showError(formError, ""); // clear error
+  }
+  
   if (costo >= 0 && margen >= 0) {
-    const precioFinal = costo + (costo * margen / 100);
+    const precioFinal = costo / (1 - (margen / 100));
     const ganancia = precioFinal - costo;
     document.getElementById("precio").value = pesos(precioFinal);
     document.getElementById("gananciaNeta").value = pesos(ganancia);
@@ -364,7 +373,13 @@ document.getElementById("formAbm").addEventListener("submit", (e) => {
   const minimo = Number(document.getElementById("minimo").value);
   const costo = Number(document.getElementById("costo").value);
   const margenEsperado = Number(document.getElementById("margenEsperado").value);
-  const precio = costo + (costo * margenEsperado / 100);
+  
+  if (margenEsperado >= 100) {
+    showError(formError, "El margen de ganancia debe ser menor al 100%.");
+    return;
+  }
+  
+  const precio = costo / (1 - (margenEsperado / 100));
   
   if (stock < 0 || unidades_por_caja < 1 || minimo < 0 || costo < 0 || margenEsperado < 0) {
     showError(formError, "Valores numéricos inválidos.");
