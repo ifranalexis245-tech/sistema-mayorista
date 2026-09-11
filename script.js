@@ -90,7 +90,7 @@ function renderKpis() {
   document.getElementById("kpis").innerHTML = `
     <article class="kpi"><span>SKUs</span><strong>${productos.length}</strong></article>
     <article class="kpi"><span>Por debajo del mínimo</span><strong>${bajos.length}</strong></article>
-    <article class="kpi"><span>Bultos a reponer</span><strong>${bajos.reduce((a, p) => a + (p.minimo - p.stock), 0)}</strong></article>
+    <article class="kpi"><span>Cajas/Packs a reponer</span><strong>${bajos.reduce((a, p) => a + (p.minimo - p.stock), 0)}</strong></article>
     <article class="kpi"><span>Valor en stock</span><strong>${pesos(valor)}</strong></article>
   `;
 }
@@ -107,7 +107,7 @@ function renderTabla() {
       <tr class="${crit ? "bajo" : ""} ${vence ? "bajo" : ""}">
         <td class="check"><input type="checkbox" data-check="${p.id}" ${seleccion.has(p.id) ? "checked" : ""} /></td>
         <td class="sku">${esc(p.sku)}</td>
-        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">$${p.precio}</span></span></td>
+        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">$${p.precio}</span> · Ganancia: $${p.gananciaNeta || 0} (${p.margenBruto || 0}%)</span></td>
         <td style="${vence ? 'color: red; font-weight: bold;' : ''}">${fechaVencFmt}</td>
         <td>${esc(p.categoria)}</td>
         <td>${esc(p.proveedor)}</td>
@@ -200,9 +200,9 @@ function abrir(item) {
   document.getElementById("stock").value = item?.stock ?? 0;
   document.getElementById("minimo").value = item?.minimo ?? 0;
   document.getElementById("costo").value = item?.costo ?? 0;
-  document.getElementById("porcentaje").value = item?.porcentaje ?? 30;
   document.getElementById("precio").value = item?.precio ?? 0;
   document.getElementById("sku").readOnly = Boolean(item);
+  calcularMargen();
   modal.showModal();
 }
 
@@ -225,14 +225,22 @@ document.getElementById("movMotivo").addEventListener("change", (e) => {
   document.getElementById("labelMetodoPago").hidden = !isVenta;
 });
 
-function calcularPrecio() {
+function calcularMargen() {
   const costo = Number(document.getElementById("costo").value);
-  const porcentaje = Number(document.getElementById("porcentaje").value);
-  document.getElementById("precio").value = Math.round(costo * (1 + porcentaje / 100));
+  const precio = Number(document.getElementById("precio").value);
+  if (precio > 0) {
+    const ganancia = precio - costo;
+    const margen = (ganancia / precio) * 100;
+    document.getElementById("gananciaNeta").value = pesos(ganancia);
+    document.getElementById("margenBruto").value = margen.toFixed(2) + '%';
+  } else {
+    document.getElementById("gananciaNeta").value = "$0";
+    document.getElementById("margenBruto").value = "0%";
+  }
 }
 
-document.getElementById("costo").addEventListener("input", calcularPrecio);
-document.getElementById("porcentaje").addEventListener("input", calcularPrecio);
+document.getElementById("costo").addEventListener("input", calcularMargen);
+document.getElementById("precio").addEventListener("input", calcularMargen);
 
 function borrarIds(ids) {
   productos = productos.filter((p) => !ids.includes(p.id));
@@ -286,12 +294,13 @@ document.getElementById("formAbm").addEventListener("submit", (e) => {
   const stock = Number(document.getElementById("stock").value);
   const minimo = Number(document.getElementById("minimo").value);
   const costo = Number(document.getElementById("costo").value);
-  const porcentaje = Number(document.getElementById("porcentaje").value);
   const precio = Number(document.getElementById("precio").value);
-  if (stock < 0 || minimo < 0 || costo < 0 || porcentaje < 0 || precio < 0) {
-    showError(formError, "Stock, mínimo, costo, porcentaje y precio no pueden ser negativos.");
+  if (stock < 0 || minimo < 0 || costo < 0 || precio < 0) {
+    showError(formError, "Stock, mínimo, costo y precio no pueden ser negativos.");
     return;
   }
+  const gananciaNeta = precio > 0 ? (precio - costo) : 0;
+  const margenBruto = precio > 0 ? Number(((gananciaNeta / precio) * 100).toFixed(2)) : 0;
   const item = {
     id,
     sku,
@@ -303,8 +312,9 @@ document.getElementById("formAbm").addEventListener("submit", (e) => {
     stock,
     minimo,
     costo,
-    porcentaje,
     precio,
+    gananciaNeta,
+    margenBruto,
   };
   const i = productos.findIndex((p) => p.id === id);
   const anterior = i >= 0 ? productos[i] : null;
@@ -337,7 +347,7 @@ document.getElementById("formMov").addEventListener("submit", (e) => {
   const p = productos.find((x) => x.id === id);
   if (!p || cantidad < 1) return;
   if (tipo === "salida" && cantidad > p.stock) {
-    showError(movError, `No hay stock suficiente. Hay ${p.stock} bulto(s) de ${p.unidad}.`);
+    showError(movError, `No hay stock suficiente. Hay ${p.stock} caja(s)/pack(s) de ${p.unidad}.`);
     return;
   }
   p.stock = tipo === "entrada" ? p.stock + cantidad : p.stock - cantidad;
@@ -380,9 +390,9 @@ render();
 
 function exportarExcel() {
   let csvContent = "=== PRODUCTOS ===\n";
-  csvContent += "Cod/Lote,Nombre,Vencimiento,Categoria,Proveedor,Stock,Minimo,Costo,Precio\n";
+  csvContent += "Cod/Lote,Nombre,Vencimiento,Categoria,Proveedor,Stock,Minimo,Costo,Precio,GananciaNeta,MargenBruto\n";
   productos.forEach(p => {
-    csvContent += `"${p.sku}","${p.nombre}","${p.vencimiento||''}","${p.categoria}","${p.proveedor||''}",${p.stock},${p.minimo},${p.costo},${p.precio}\n`;
+    csvContent += `"${p.sku}","${p.nombre}","${p.vencimiento||''}","${p.categoria}","${p.proveedor||''}",${p.stock},${p.minimo},${p.costo},${p.precio},${p.gananciaNeta||0},${p.margenBruto||0}\n`;
   });
   
   csvContent += "\n=== MOVIMIENTOS ===\n";

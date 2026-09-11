@@ -106,16 +106,17 @@
         <label class="full">Producto <input type="text" id="nombre" required /></label>
         <label>Fecha de Vencimiento <input type="date" id="vencimiento" required /></label>
         <label>Proveedor <input type="text" id="proveedor" list="listaProveedores" /></label>
-        <label>Formato de Venta (Bulto)
+        <label>Formato de Venta (Caja/Pack)
           <input type="text" id="unidad" placeholder="Ej: Caja de 6, Pack de 24" required />
         </label>
-        <label>BULTOS QUE INGRESAN <input type="number" id="stock" min="0" step="1" required /></label>
-        <label style="display: flex; flex-direction: column;">Stock mínimo (Bultos) <input type="number" id="minimo" min="0" step="1" required />
+        <label>CAJAS/PACKS QUE INGRESAN <input type="number" id="stock" min="0" step="1" required /></label>
+        <label style="display: flex; flex-direction: column;">Stock mínimo (Cajas/Packs) <input type="number" id="minimo" min="0" step="1" required />
           <small style="font-size: 0.7em; color: gray; font-weight: normal; margin-top: 2px;">(Avisa al llegar a esta cantidad)</small>
         </label>
-        <label>Costo por Bulto (ARS) <input type="number" id="costo" min="0" step="0.01" required /></label>
-        <label>Remarcación (%) <input type="number" id="porcentaje" min="0" required /></label>
-        <label class="full">Precio de Venta (ARS) <input type="number" id="precio" min="0" required /></label>
+        <label>Precio de Costo (Caja/Pack) <input type="number" id="costo" min="0" step="0.01" required /></label>
+        <label>Precio de Venta Final (ARS) <input type="number" id="precio" min="0" step="0.01" required /></label>
+        <label>Ganancia Neta ($) <input type="text" id="gananciaNeta" readonly style="background: var(--bg); color: var(--fg-2);" tabindex="-1" /></label>
+        <label>Margen Bruto Real (%) <input type="text" id="margenBruto" readonly style="background: var(--bg); color: var(--fg-2);" tabindex="-1" /></label>
       </div>
       <datalist id="listaProveedores"></datalist>
       <div class="modal-acciones">
@@ -132,7 +133,7 @@
       <p class="form-error" id="movError" hidden></p>
       <input type="hidden" id="movId" />
       <input type="hidden" id="movTipo" />
-      <label>Cantidad (Bultos) <input type="number" id="movCantidad" min="1" step="1" value="1" required /></label>
+      <label>Cantidad (Cajas/Packs) <input type="number" id="movCantidad" min="1" step="1" value="1" required /></label>
       <label>Motivo
         <select id="movMotivo"></select>
       </label>
