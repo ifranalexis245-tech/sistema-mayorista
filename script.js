@@ -11,8 +11,7 @@ const SEED_MOVS = [];
 const esc = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const uid = (p) => p + Date.now().toString(36);
-const pesos = (n) =>
-  n.toLocaleString("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const pesos = (n) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
 
 function load() {
   try {
@@ -108,7 +107,7 @@ function renderTabla() {
       <tr class="${crit ? "bajo" : ""} ${vence ? "bajo" : ""}">
         <td class="check"><input type="checkbox" data-check="${p.id}" ${seleccion.has(p.id) ? "checked" : ""} /></td>
         <td class="sku">${esc(p.sku)}</td>
-        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">$${p.precio}</span> · Ganancia: $${p.gananciaNeta || 0} (${p.margenEsperado || p.margenBruto || 0}%)</span></td>
+        <td>${esc(p.nombre)}<span class="prod-meta">${esc(p.unidad)} · <span class="precio-venta">${pesos(p.precio)}</span> · Ganancia: ${pesos(p.gananciaNeta || 0)} (${p.margenEsperado || p.margenBruto || 0}%)</span></td>
         <td style="${vence ? 'color: red; font-weight: bold;' : ''}">${fechaVencFmt}</td>
         <td>${esc(p.categoria)}</td>
         <td>${esc(p.proveedor)}</td>
@@ -296,8 +295,8 @@ function calcularPrecioFinal() {
   
   if (margen >= 100) {
     showError(formError, "El margen de ganancia debe ser menor al 100%.");
-    document.getElementById("precio").value = "$0";
-    document.getElementById("gananciaNeta").value = "$0";
+    document.getElementById("precio").value = pesos(0);
+    document.getElementById("gananciaNeta").value = pesos(0);
     return;
   } else {
     showError(formError, ""); // clear error
@@ -309,8 +308,8 @@ function calcularPrecioFinal() {
     document.getElementById("precio").value = pesos(precioFinal);
     document.getElementById("gananciaNeta").value = pesos(ganancia);
   } else {
-    document.getElementById("precio").value = "$0";
-    document.getElementById("gananciaNeta").value = "$0";
+    document.getElementById("precio").value = pesos(0);
+    document.getElementById("gananciaNeta").value = pesos(0);
   }
 }
 
