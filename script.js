@@ -1,5 +1,5 @@
 const KEY = "almacen-plantilla";
-const CATEGORIAS = ["Alimentos", "Bebidas", "Fiambres", "Lácteos", "Varios"];
+const CATEGORIAS = ["Congelados", "Embutidos", "Aderezos", "Lácteos", "Panificados", "Bebidas", "Descartables", "Snacks", "Otros"];
 const MOTIVOS_IN = ["Compra a proveedor", "Ajuste de inventario", "Devolución"];
 const MOTIVOS_OUT = ["Venta", "Merma", "Ajuste de inventario", "Consumo interno"];
 const HOY = new Date(); // Mock date base
@@ -81,6 +81,7 @@ function renderFiltros() {
     `<option value="todos">Todos los proveedores</option>` +
     proveedores.map((p) => `<option ${p === provActual ? "selected" : ""}>${esc(p)}</option>`).join("");
   document.getElementById("categoria").innerHTML = CATEGORIAS.map((c) => `<option>${esc(c)}</option>`).join("");
+  document.getElementById("cajaCategoria").innerHTML = CATEGORIAS.map((c) => `<option>${esc(c)}</option>`).join("");
   document.getElementById("listaProveedores").innerHTML = proveedores.map((p) => `<option value="${esc(p)}"></option>`).join("");
 }
 
@@ -452,6 +453,7 @@ document.getElementById("formMov").addEventListener("submit", (e) => {
     flujoCaja.push({
       id: uid("fc-"),
       tipo: "ingreso",
+      categoria: p.categoria,
       monto: cantidad * (p.precio || 0),
       detalle: `Venta de stock: ${cantidad} cajas/packs de ${p.nombre}`,
       fecha: new Date().toISOString().split('T')[0]
@@ -459,7 +461,8 @@ document.getElementById("formMov").addEventListener("submit", (e) => {
   } else if (tipo === "entrada" && motivo === "Compra a proveedor") {
     flujoCaja.push({
       id: uid("fc-"),
-      tipo: "egreso_prov",
+      tipo: "egreso",
+      categoria: p.categoria,
       monto: cantidad * (p.costo || 0),
       detalle: `Compra de stock: ${cantidad} cajas/packs de ${p.nombre}`,
       fecha: new Date().toISOString().split('T')[0]
@@ -492,6 +495,7 @@ document.getElementById("tablaStock").addEventListener("change", (e) => {
 document.getElementById("formCaja").addEventListener("submit", (e) => {
   e.preventDefault();
   const tipo = document.getElementById("cajaTipo").value;
+  const categoria = document.getElementById("cajaCategoria").value;
   const monto = Number(document.getElementById("cajaMonto").value);
   const detalle = document.getElementById("cajaDetalle").value.trim();
   const fecha = document.getElementById("cajaFecha").value;
@@ -499,6 +503,7 @@ document.getElementById("formCaja").addEventListener("submit", (e) => {
   flujoCaja.push({
     id: uid("fc-"),
     tipo,
+    categoria,
     monto,
     detalle,
     fecha

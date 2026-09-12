@@ -25,6 +25,8 @@ Chart.defaults.font.family = "Poppins, system-ui, sans-serif";
 Chart.defaults.color = "#565B66";
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
 
+const CATEGORIAS = ["Congelados", "Embutidos", "Aderezos", "Lácteos", "Panificados", "Bebidas", "Descartables", "Snacks", "Otros"];
+
 let storeData = { productos: [], movimientos: [], flujoCaja: [] };
 
 function load() {
@@ -42,8 +44,8 @@ function load() {
     return {
       id: m.id,
       fecha: m.fecha,
-      tipo: mapped.tipo,
-      categoria: mapped.categoria,
+      tipo: m.tipo === 'ingreso' || m.tipo === 'egreso' ? m.tipo : mapped.tipo,
+      categoria: m.categoria || mapped.categoria,
       descripcion: m.detalle,
       monto: m.monto
     };
@@ -64,7 +66,8 @@ function persist() {
     return {
       id: m.id,
       fecha: m.fecha,
-      tipo: REVERSE_CAT_MAP[m.categoria] || (m.tipo === "ingreso" ? "ingreso" : "egreso_gasto"),
+      tipo: m.tipo, // Save exactly what it is (ingreso/egreso)
+      categoria: m.categoria, // Save the product/financial category
       detalle: m.descripcion,
       monto: m.monto
     };
@@ -276,7 +279,9 @@ function abrir(item) {
   document.getElementById("modalTitulo").textContent = item ? "Editar movimiento" : "Nuevo movimiento";
   document.getElementById("editId").value = item?.id || "";
   document.getElementById("fecha").value = item?.fecha || new Date().toISOString().split('T')[0];
-  document.getElementById("categoria").value = item?.categoria || "Ingresos por Ventas";
+  document.getElementById("tipo").value = item?.tipo || "ingreso";
+  document.getElementById("categoria").innerHTML = CATEGORIAS.map(c => `<option>${esc(c)}</option>`).join("");
+  document.getElementById("categoria").value = item?.categoria || CATEGORIAS[0];
   document.getElementById("descripcion").value = item?.descripcion || "";
   document.getElementById("monto").value = item?.monto || "";
   modal.showModal();
@@ -288,8 +293,8 @@ document.getElementById("filtroCategoria").addEventListener("change", renderTabl
 
 document.getElementById("formAbm").addEventListener("submit", (e) => {
   e.preventDefault();
+  const tipo = document.getElementById("tipo").value;
   const categoria = document.getElementById("categoria").value;
-  const tipo = categoria === "Ingresos por Ventas" ? "ingreso" : "egreso";
   const item = {
     id: document.getElementById("editId").value || uid(),
     fecha: document.getElementById("fecha").value,

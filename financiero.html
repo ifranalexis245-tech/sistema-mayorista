@@ -114,13 +114,16 @@
     <form id="formAbm">
       <h2 id="modalTitulo">Nuevo movimiento</h2>
       <input type="hidden" id="editId" />
-      <input type="hidden" id="tipo" value="ingreso" />
       <label>Fecha <input type="date" id="fecha" required /></label>
       <label>Tipo de Movimiento
+        <select id="tipo" required>
+          <option value="ingreso">Ingreso</option>
+          <option value="egreso">Egreso</option>
+        </select>
+      </label>
+      <label>Categoría
         <select id="categoria" required>
-          <option>Ingresos por Ventas</option>
-          <option>Pago a Proveedores</option>
-          <option>Gastos del Local</option>
+          <!-- Populated by JS -->
         </select>
       </label>
       <label>Detalle <input type="text" id="descripcion" placeholder="Ej: 10 Cajas/Packs de Patys, Pago a proveedor" required /></label>
